@@ -1,0 +1,15 @@
+# SCHOLY AGENT - dependencias del MVP
+# Se fijan rangos compatibles; usa "pip install -r requirements.txt" dentro de un venv.
+
+# Núcleo: Agent Development Kit de Google (agentes, herramientas, runner, plugins)
+google-adk>=1.0.0
+
+# Backend web que expone los agentes como API y sirve el frontend
+fastapi>=0.110.0
+uvicorn[standard]>=0.29.0
+
+# Validación y modelado de datos (perfil del estudiante, becas, recomendaciones)
+pydantic>=2.6.0
+
+# Carga de variables de entorno desde .env (manejo seguro de secretos)
+python-dotenv>=1.0.0

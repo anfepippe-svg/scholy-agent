@@ -1,0 +1,29 @@
+# Secretos: NUNCA subir credenciales al repositorio
+.env
+*.env
+!.env.example
+
+# Logs y trazas generadas por la observabilidad
+*.log
+logs/
+
+# Entornos virtuales de Python
+.venv/
+venv/
+env/
+
+# Cachés de Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+
+# ADK / sesiones locales
+*.sqlite
+*.db
+
+# Sistema operativo / editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
