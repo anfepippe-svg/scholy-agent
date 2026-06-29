@@ -1,36 +1,37 @@
 # SCHOLY AGENT
 
-Sistema **multiagente** construido con el **Google Agent Development Kit (ADK)**
-que ayuda a estudiantes a encontrar las becas universitarias que mejor se alinean
-con su perfil (nivel académico, área, país, idioma, nacionalidad y finanzas), y
-les explica el **encaje financiero** de cada opción.
+A **multi-agent** system built with the **Google Agent Development Kit (ADK)**
+that helps students find the university scholarships that best match their
+profile (academic level, field, country, language, nationality, and finances),
+and explains the **financial fit** of each option.
 
-Proyecto final del *5-Day AI Agents Intensive Course with Google*.
+Final project of the *5-Day AI Agents Intensive Course with Google*.
 
 ---
 
-## 1. El problema
+## 1. The problem
 
-Buscar becas es lento, confuso y disperso: la información está repartida en
-cientos de sitios, con requisitos distintos (nivel, idioma, nacionalidad, GPA) y,
-lo más importante, **una beca "encontrada" no siempre es viable**: muchas cubren
-solo la matrícula y dejan por fuera vivienda, comida y transporte en otro país.
+Searching for scholarships is slow, confusing, and scattered: information is
+spread across hundreds of sites, with different requirements (level, language,
+nationality, GPA) and, most importantly, **a scholarship you "find" is not always
+viable**: many cover only tuition and leave out housing, food, and transport in
+another country.
 
-## 2. La solución y por qué agentes
+## 2. The solution and why agents
 
-Un único prompt no resuelve bien una tarea con varias etapas heterogéneas
-(entender al usuario → buscar en la web → filtrar por reglas → aconsejar). Un
-**equipo de agentes especializados** sí: cada uno hace una cosa bien, es
-mantenible y auditable. SCHOLY usa cuatro agentes en un pipeline secuencial:
+A single prompt does not solve a task with several heterogeneous stages well
+(understand the user → search the web → filter by rules → advise). A **team of
+specialized agents** does: each one does one thing well, is maintainable and
+auditable. SCHOLY uses four agents in a sequential pipeline:
 
-| Agente | Qué hace |
+| Agent | What it does |
 | --- | --- |
-| **ProfileAgent** | Normaliza y valida el perfil del estudiante. |
-| **SearchAgent** | Busca becas reales en internet con `google_search` (grounding). |
-| **EligibilityAgent** | Filtra por elegibilidad y puntúa con una herramienta determinista. |
-| **AdvisorAgent** | Entrega la recomendación final + análisis financiero (JSON estructurado). |
+| **ProfileAgent** | Normalizes and validates the student's profile. |
+| **SearchAgent** | Finds real scholarships on the web with `google_search` (grounding). |
+| **EligibilityAgent** | Filters by eligibility and scores with a deterministic tool. |
+| **AdvisorAgent** | Delivers the final recommendation + financial analysis (structured JSON). |
 
-## 3. Arquitectura
+## 3. Architecture
 
 ```mermaid
 flowchart LR
@@ -41,99 +42,99 @@ flowchart LR
     Advisor --> API --> UI
 ```
 
-El estado fluye entre agentes con `output_key` → `{clave}`:
+State flows between agents via `output_key` → `{key}`:
 `student_profile` → `raw_scholarships` → `eligible_scholarships` → `final_recommendation`.
 
-Detalle completo en [docs/architecture.md](docs/architecture.md).
+Full details in [docs/architecture.md](docs/architecture.md).
 
-## 4. Estructura del proyecto
+## 4. Project structure
 
 ```
 scholy-agent/
-├─ scholy/                  # Paquete del sistema multiagente (ADK)
-│  ├─ agent.py              # root_agent (SequentialAgent) -> entrypoint ADK
-│  ├─ config.py             # Configuración desde entorno (cero secretos en código)
-│  ├─ llm.py                # Fábrica del modelo Gemini (compartida)
-│  ├─ schemas.py            # Modelos pydantic (StudentProfile, Scholarship, Recommendation)
-│  ├─ observability.py      # Logging + plugins de métricas (Agent Ops)
+├─ scholy/                  # Multi-agent system package (ADK)
+│  ├─ agent.py              # root_agent (SequentialAgent) -> ADK entrypoint
+│  ├─ config.py             # Configuration from environment (zero secrets in code)
+│  ├─ llm.py                # Gemini model factory (shared)
+│  ├─ schemas.py            # pydantic models (StudentProfile, Scholarship, Recommendation)
+│  ├─ observability.py      # Logging + metrics plugins (Agent Ops)
 │  ├─ agents/               # ProfileAgent, SearchAgent, EligibilityAgent, AdvisorAgent
-│  ├─ tools/                # FunctionTool de compatibilidad + conector MCP (V2)
-│  └─ security/             # Guardrails deterministas + SecurityGuardrailPlugin
-├─ server/main.py           # Backend FastAPI (API + sirve el frontend)
-├─ frontend/                # UI minimalista (HTML + Tailwind CDN + JS vanilla)
-├─ docs/architecture.md     # Diagramas y decisiones de diseño
-├─ AGENTS.md                # Constitución/harness del sistema
+│  ├─ tools/                # Compatibility FunctionTool + MCP connector (V2)
+│  └─ security/             # Deterministic guardrails + SecurityGuardrailPlugin
+├─ server/main.py           # FastAPI backend (API + serves the frontend)
+├─ frontend/                # Minimalist UI (HTML + Tailwind CDN + vanilla JS)
+├─ docs/architecture.md     # Diagrams and design decisions
+├─ AGENTS.md                # System constitution / harness
 ├─ requirements.txt
-├─ .env.example             # Plantilla de variables (copiar a .env)
+├─ .env.example             # Variables template (copy to .env)
 └─ .gitignore
 ```
 
-## 5. Setup (local, gratis)
+## 5. Setup (local, free)
 
-Requisitos: Python 3.11+ y una API key gratuita de Google AI Studio.
+Requirements: Python 3.11+ and a free Google AI Studio API key.
 
 ```bash
-# 1. Entorno virtual
+# 1. Virtual environment
 python -m venv .venv
 .venv\Scripts\activate          # Windows (PowerShell)
 # source .venv/bin/activate      # macOS / Linux
 
-# 2. Dependencias
+# 2. Dependencies
 pip install -r requirements.txt
 
-# 3. Credenciales
-copy .env.example .env           # Windows  (cp en macOS/Linux)
-# Edita .env y pega tu GOOGLE_API_KEY  (https://aistudio.google.com/apikey)
+# 3. Credentials
+copy .env.example .env           # Windows  (cp on macOS/Linux)
+# Edit .env and paste your GOOGLE_API_KEY  (https://aistudio.google.com/apikey)
 ```
 
-> El MVP corre **100% gratis** con la capa gratuita de Gemini. `google_search`
-> (grounding) funciona dentro de esa capa, con límites de cuota.
+> The MVP runs **100% free** on the Gemini free tier. `google_search` (grounding)
+> works within that tier, subject to quota limits.
 
-## 6. Ejecutar
+## 6. Run
 
-**Opción A - Aplicación web (recomendada):**
+**Option A - Web application (recommended):**
 
 ```bash
 uvicorn server.main:app --reload --port 8000
-# Abre http://localhost:8000
+# Open http://localhost:8000
 ```
 
-**Opción B - UI de desarrollo del ADK (útil para ver traces en el demo):**
+**Option B - ADK development UI (useful to inspect traces in the demo):**
 
 ```bash
-adk web            # ejecútalo en la carpeta que contiene el paquete "scholy"
-# adk web --log_level DEBUG   # para inspeccionar spans/tokens en la pestaña Events
+adk web            # run it in the folder that contains the "scholy" package
+# adk web --log_level DEBUG   # to inspect spans/tokens in the Events tab
 ```
 
-## 7. Seguridad
+## 7. Security
 
-- **Cero API keys en el código.** Todo secreto vive en `.env` (ignorado por git).
-  Nunca subas tu `.env`.
-- **Anti prompt-injection (2 capas):** guardrails deterministas
-  ([scholy/security/guardrails.py](scholy/security/guardrails.py)) + un plugin que
-  inspecciona las peticiones al modelo
+- **Zero API keys in code.** Every secret lives in `.env` (git-ignored).
+  Never commit your `.env`.
+- **Anti prompt-injection (2 layers):** deterministic guardrails
+  ([scholy/security/guardrails.py](scholy/security/guardrails.py)) + a plugin that
+  inspects requests to the model
   ([scholy/security/plugins.py](scholy/security/plugins.py)).
-- **Instrucciones defensivas** en cada agente (input = datos, no órdenes).
-- **Anti-XSS** en el frontend (se escapa todo dato del agente).
-- **Minimización de PII** en los logs.
-- *Producción:* **Model Armor** de GCP como capa extra (requiere facturación).
+- **Defensive instructions** in every agent (input = data, not commands).
+- **Anti-XSS** in the frontend (all agent output is escaped).
+- **PII minimization** in the logs.
+- *Production:* GCP **Model Armor** as an extra layer (requires billing).
 
-## 8. Observabilidad
+## 8. Observability
 
-`LoggingPlugin` (ADK) + `CountInvocationPlugin` propio registran agentes ejecutados
-y llamadas al modelo en `scholy.log`. Ver [scholy/observability.py](scholy/observability.py).
+`LoggingPlugin` (ADK) + a custom `CountInvocationPlugin` record executed agents
+and model calls in `scholy.log`. See [scholy/observability.py](scholy/observability.py).
 
-## 9. Despliegue (documentado)
+## 9. Deployment (documented)
 
-> **Importante:** este proyecto se desarrolló **sin facturación de GCP**. Cloud Run
-> y Vertex AI Agent Engine **requieren billing**, por lo que el MVP se ejecuta en
-> local. La rúbrica no exige desplegar; a continuación queda la guía reproducible.
+> **Important:** this project was developed **without GCP billing**. Cloud Run and
+> Vertex AI Agent Engine **require billing**, so the MVP runs locally. The rubric
+> does not require deployment; below is the reproducible guide.
 
-Despliegue en **Cloud Run** (cuando haya facturación):
+Deployment on **Cloud Run** (when billing is available):
 
 ```bash
-# 1. Empaqueta el backend en un contenedor (FastAPI + uvicorn).
-#    Asegúrate de tener un Dockerfile que ejecute:
+# 1. Package the backend in a container (FastAPI + uvicorn).
+#    Make sure you have a Dockerfile that runs:
 #      uvicorn server.main:app --host 0.0.0.0 --port $PORT
 gcloud run deploy scholy-agent \
   --source . \
@@ -142,12 +143,12 @@ gcloud run deploy scholy-agent \
   --set-secrets "GOOGLE_API_KEY=GOOGLE_API_KEY:latest"
 ```
 
-- La `GOOGLE_API_KEY` se inyecta desde **Secret Manager**, nunca desde el código.
-- Alternativa nativa de ADK: `adk deploy cloud_run` (también requiere billing).
+- The `GOOGLE_API_KEY` is injected from **Secret Manager**, never from the code.
+- Native ADK alternative: `adk deploy cloud_run` (also requires billing).
 
 ## 10. Roadmap (V2)
 
-- **Coach de postulación**: pasos, deadlines y revisión de ensayos.
-- **Búsqueda externa por MCP**: activar `tools/search_mcp.py` con un servidor MCP
-  (p. ej. Tavily/Serper) para resultados más estructurados.
-- **Evaluación con LM-as-Judge** sobre un golden dataset de perfiles.
+- **Application coach**: steps, deadlines, and essay review.
+- **External search via MCP**: enable `tools/search_mcp.py` with an MCP server
+  (e.g. Tavily/Serper) for more structured results.
+- **LM-as-a-Judge evaluation** over a golden dataset of profiles.
